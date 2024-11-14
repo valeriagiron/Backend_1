@@ -40,7 +40,7 @@ router.post("/", async (req, res) => {
 router.post("/:cid/products/:pid", async (req, res) => {
     try {
         const { cid, pid } = req.params;
-        const { quantity } = req.body; // Quantity es el número de ejemplares que se agregan al carrito
+        const { quantity } = req.body; 
         const cart = await cartManager.addProductToCart(cid, pid, quantity || 1);
         res.status(200).json({ status: "success", payload: cart });
     } catch (error) {
@@ -52,7 +52,7 @@ router.post("/:cid/products/:pid", async (req, res) => {
 router.put("/:cid/products/:pid", async (req, res) => {
     try {
         const { cid, pid } = req.params;
-        const { quantity } = req.body; // Actualiza la cantidad
+        const { quantity } = req.body; 
         const cart = await cartManager.updateProductQuantity(cid, pid, quantity);
         res.status(200).json({ status: "success", payload: cart });
     } catch (error) {

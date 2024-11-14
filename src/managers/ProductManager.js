@@ -1,126 +1,91 @@
 import paths from "../utils/paths.js";
-import { readJsonFile, writeJsonFile, deleteFile } from "../utils/fileHandler.js";
+import { readJsonFile, writeJsonFile } from "../utils/fileHandler.js";
 import { generateId } from "../utils/collectionHandler.js";
-import { convertToBoolean } from "../utils/converter.js";
 import ErrorManager from "./ErrorManager.js";
 
-export default class IngredientManager {
+export default class ProductManager {
     #jsonFilename;
-    #ingredients;
+    #products;
 
     constructor() {
-        this.#jsonFilename = "ingredients.json";
+        this.#jsonFilename = "products.json";
     }
 
-    // Busca un ingrediente por su ID
     async #findOneById(id) {
-        this.#ingredients = await this.getAll();
-        const ingredientFound = this.#ingredients.find((item) => item.id === Number(id));
+        this.#products = await this.getAll();
+        const productFound = this.#products.find((item) => item.id === Number(id));
 
-        if (!ingredientFound) {
+        if (!productFound) {
             throw new ErrorManager("ID no encontrado", 404);
         }
 
-        return ingredientFound;
+        return productFound;
     }
 
-    // Obtiene una lista de ingredientes
-    async getAll() {
+    async getAll(limit) {
         try {
-            this.#ingredients = await readJsonFile(paths.files, this.#jsonFilename);
-            return this.#ingredients;
+            this.#products = await readJsonFile(paths.files, this.#jsonFilename);
+            return limit ? this.#products.slice(0, limit) : this.#products;
         } catch (error) {
             throw new ErrorManager(error.message, error.code);
         }
     }
 
-    // Obtiene un ingrediente específico por su ID
     async getOneById(id) {
-        try {
-            const ingredientFound = await this.#findOneById(id);
-            return ingredientFound;
-        } catch (error) {
-            throw new ErrorManager(error.message, error.code);
-        }
+        return await this.#findOneById(id);
     }
 
-    // Inserta un ingrediente
-    async insertOne(data, file) {
-        try {
-            const { title, status, stock } = data;
+    async insertOne(data) {
+        const { title, description, code, price, stock, category, thumbnails = [] } = data;
 
-            if (!title || !status || !stock ) {
-                throw new ErrorManager("Faltan datos obligatorios", 400);
-            }
-
-            if (!file?.filename) {
-                throw new ErrorManager("Falta el archivo de la imagen", 400);
-            }
-
-            const ingredient = {
-                id: generateId(await this.getAll()),
-                title,
-                status: convertToBoolean(status),
-                stock: Number(stock),
-                thumbnail: file?.filename,
-            };
-
-            this.#ingredients.push(ingredient);
-            await writeJsonFile(paths.files, this.#jsonFilename, this.#ingredients);
-
-            return ingredient;
-        } catch (error) {
-            if (file?.filename) await deleteFile(paths.images, file.filename); // Elimina la imagen si ocurre un error
-            throw new ErrorManager(error.message, error.code);
+        if (!title || !description || !code || price === undefined || stock === undefined || !category) {
+            throw new ErrorManager("Faltan datos obligatorios", 400);
         }
+
+        const product = {
+            id: generateId(await this.getAll()),
+            title,
+            description,
+            code,
+            price: Number(price),
+            status: true,
+            stock: Number(stock),
+            category,
+            thumbnails
+        };
+
+        this.#products.push(product);
+        await writeJsonFile(paths.files, this.#jsonFilename, this.#products);
+
+        return product;
     }
 
-    // Actualiza un ingrediente en específico
-    async updateOneById(id, data, file) {
-        try {
-            const { title, status, stock } = data;
-            const ingredientFound = await this.#findOneById(id);
-            const newThumbnail = file?.filename;
+    async updateOneById(id, data) {
+        const { title, description, code, price, stock, category, thumbnails } = data;
+        const productFound = await this.#findOneById(id);
 
-            const ingredient = {
-                id: ingredientFound.id,
-                title: title || ingredientFound.title,
-                status: status ? convertToBoolean(status) : ingredientFound.status,
-                stock: stock ? Number(stock) : ingredientFound.stock,
-                thumbnail: newThumbnail || ingredientFound.thumbnail,
-            };
+        const updatedProduct = {
+            ...productFound,
+            title: title || productFound.title,
+            description: description || productFound.description,
+            code: code || productFound.code,
+            price: price !== undefined ? Number(price) : productFound.price,
+            stock: stock !== undefined ? Number(stock) : productFound.stock,
+            category: category || productFound.category,
+            thumbnails: thumbnails || productFound.thumbnails
+        };
 
-            const index = this.#ingredients.findIndex((item) => item.id === Number(id));
-            this.#ingredients[index] = ingredient;
-            await writeJsonFile(paths.files, this.#jsonFilename, this.#ingredients);
+        const index = this.#products.findIndex((item) => item.id === Number(id));
+        this.#products[index] = updatedProduct;
+        await writeJsonFile(paths.files, this.#jsonFilename, this.#products);
 
-            // Elimina la imagen anterior si es distinta de la nueva
-            if (file?.filename && newThumbnail !== ingredientFound.thumbnail) {
-                await deleteFile(paths.images, ingredientFound.thumbnail);
-            }
-
-            return ingredient;
-        } catch (error) {
-            if (file?.filename) await deleteFile(paths.images, file.filename); // Elimina la imagen si ocurre un error
-            throw new ErrorManager(error.message, error.code);
-        }
+        return updatedProduct;
     }
 
-    // Elimina un ingrediente en específico
-    async deleteOneById (id) {
-        try {
-            const ingredientFound = await this.#findOneById(id);
-
-            // Si tiene thumbnail definido, entonces, elimina la imagen del ingrediente
-            if (ingredientFound.thumbnail) {
-                await deleteFile(paths.images, ingredientFound.thumbnail);
-            }
-
-            const index = this.#ingredients.findIndex((item) => item.id === Number(id));
-            this.#ingredients.splice(index, 1);
-            await writeJsonFile(paths.files, this.#jsonFilename, this.#ingredients);
-        } catch (error) {
-            throw new ErrorManager(error.message, error.code);
-        }
+    async deleteOneById(id) {
+        const productFound = await this.#findOneById(id);
+        const index = this.#products.findIndex((item) => item.id === Number(id));
+        this.#products.splice(index, 1);
+        await writeJsonFile(paths.files, this.#jsonFilename, this.#products);
     }
 }

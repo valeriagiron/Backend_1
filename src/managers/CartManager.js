@@ -3,86 +3,57 @@ import { readJsonFile, writeJsonFile } from "../utils/fileHandler.js";
 import { generateId } from "../utils/collectionHandler.js";
 import ErrorManager from "./ErrorManager.js";
 
-export default class RecipeManager {
+export default class CartManager {
     #jsonFilename;
-    #recipes;
+    #carts;
 
     constructor() {
-        this.#jsonFilename = "recipes.json";
+        this.#jsonFilename = "carts.json";
     }
 
-    // Busca un receta por su ID
-    async #findOneById(id) {
-        this.#recipes = await this.getAll();
-        const recipeFound = this.#recipes.find((item) => item.id === Number(id));
+    async #findCartById(id) {
+        this.#carts = await this.getAll();
+        const cartFound = this.#carts.find((cart) => cart.id === Number(id));
 
-        if (!recipeFound) {
-            throw new ErrorManager("ID no encontrado", 404);
+        if (!cartFound) {
+            throw new ErrorManager("Carrito no encontrado", 404);
         }
 
-        return recipeFound;
+        return cartFound;
     }
 
-    // Obtiene una lista de recetas
     async getAll() {
-        try {
-            this.#recipes = await readJsonFile(paths.files, this.#jsonFilename);
-            return this.#recipes;
-        } catch (error) {
-            throw new ErrorManager(error.message, error.code);
-        }
+        return await readJsonFile(paths.files, this.#jsonFilename);
     }
 
-    // Obtiene un receta específica por su ID
     async getOneById(id) {
-        try {
-            const recipeFound = await this.#findOneById(id);
-            return recipeFound;
-        } catch (error) {
-            throw new ErrorManager(error.message, error.code);
-        }
+        return await this.#findCartById(id);
     }
 
-    // Inserta un receta
-    async insertOne(data) {
-        try {
-            const ingredients = data?.ingredients?.map((item) => {
-                return { ingredient: Number(item.ingredient), quantity: 1 };
-            });
+    async createCart() {
+        const newCart = {
+            id: generateId(await this.getAll()),
+            products: []
+        };
 
-            const recipe = {
-                id: generateId(await this.getAll()),
-                ingredients: ingredients ?? [],
-            };
+        this.#carts.push(newCart);
+        await writeJsonFile(paths.files, this.#jsonFilename, this.#carts);
 
-            this.#recipes.push(recipe);
-            await writeJsonFile(paths.files, this.#jsonFilename, this.#recipes);
-
-            return recipe;
-        } catch (error) {
-            throw new ErrorManager(error.message, error.code);
-        }
+        return newCart;
     }
 
-    // Agrega un ingrediente a una receta o incrementa la cantidad de un ingrediente existente
-    addOneIngredient = async (id, ingredientId) => {
-        try {
-            const recipeFound = await this.#findOneById(id);
-            const ingredientIndex = recipeFound.ingredients.findIndex((item) => item.ingredient === Number(ingredientId));
+    async addProductToCart(cartId, productId) {
+        const cart = await this.#findCartById(cartId);
 
-            if (ingredientIndex >= 0) {
-                recipeFound.ingredients[ingredientIndex].quantity++;
-            } else {
-                recipeFound.ingredients.push({ ingredient: Number(ingredientId), quantity: 1 });
-            }
-
-            const index = this.#recipes.findIndex((item) => item.id === Number(id));
-            this.#recipes[index] = recipeFound;
-            await writeJsonFile(paths.files, this.#jsonFilename, this.#recipes);
-
-            return recipeFound;
-        } catch (error) {
-            throw new ErrorManager(error.message, error.code);
+        const productInCart = cart.products.find((p) => p.product === productId);
+        if (productInCart) {
+            productInCart.quantity += 1;
+        } else {
+            cart.products.push({ product: productId, quantity: 1 });
         }
-    };
+
+        await writeJsonFile(paths.files, this.#jsonFilename, this.#carts);
+
+        return cart;
+    }
 }
