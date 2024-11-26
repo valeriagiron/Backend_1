@@ -13,24 +13,120 @@
 		]
 	},
 	{
-		"id": 4,
-		"title": "x",
+		"id": 2,
+		"title": "Producto de prueba B",
+		"description": "Descripción del producto B",
+		"code": "PROD-B",
+		"price": 39.99,
 		"status": false,
-		"stock": 22,
-		"thumbnail": null
+		"stock": 300,
+		"category": "Categoría B",
+		"thumbnails": [
+			"file_9807_03112024_230420.jpg"
+		]
+	},
+	{
+		"id": 3,
+		"title": "Producto de prueba C",
+		"description": "Descripción del producto C",
+		"code": "PROD-C",
+		"price": 9.99,
+		"status": false,
+		"stock": 50,
+		"category": "Categoría C",
+		"thumbnails": [
+			"file_9564_03112024_230440.jpg"
+		]
+	},
+	{
+		"id": 4,
+		"title": "Producto de prueba D",
+		"description": "Descripción del producto D",
+		"code": "PROD-D",
+		"price": 49.99,
+		"status": false,
+		"stock": 300,
+		"category": "Categoría D",
+		"thumbnails": [
+			"file_6555_041120.jpg"
+		]
 	},
 	{
 		"id": 5,
-		"title": "xxx",
+		"title": "Producto de prueba E",
+		"description": "Descripción del producto E",
+		"code": "PROD-E",
+		"price": 69.99,
 		"status": false,
-		"stock": 20,
-		"thumbnail": null
+		"stock": 48,
+		"category": "Categoría E",
+		"thumbnails": [
+			"file_2022_041120.jpg"
+		]
 	},
 	{
 		"id": 6,
-		"title": "prueba",
+		"title": "Producto de prueba F",
+		"description": "Descripción del producto F",
+		"code": "PROD-F",
+		"price": 59.99,
 		"status": false,
-		"stock": 3,
-		"thumbnail": null
+		"stock": 8,
+		"category": "Categoría F",
+		"thumbnails": [
+			"file_4568_041120.jpg"
+		]
+	},
+	{
+		"id": 7,
+		"title": "Producto de prueba G",
+		"description": "Descripción del producto G",
+		"code": "PROD-G",
+		"price": 9.99,
+		"status": false,
+		"stock": 18,
+		"category": "Categoría G",
+		"thumbnails": [
+			"file_4958_041120.jpg"
+		]
+	},
+	{
+		"id": 8,
+		"title": "Producto de prueba H",
+		"description": "Descripción del producto H",
+		"code": "PROD-H",
+		"price": 99.99,
+		"status": false,
+		"stock": 100,
+		"category": "Categoría H",
+		"thumbnails": [
+			"file_1264_041120.jpg"
+		]
+	},
+	{
+		"id": 9,
+		"title": "Producto de prueba I",
+		"description": "Descripción del producto I",
+		"code": "PROD-I",
+		"price": 79.99,
+		"status": false,
+		"stock": 30,
+		"category": "Categoría I",
+		"thumbnails": [
+			"file_3546_041120.jpg"
+		]
+	},
+	{
+		"id": 10,
+		"title": "Producto de prueba J",
+		"description": "Descripción del producto J",
+		"code": "PROD-J",
+		"price": 29.99,
+		"status": false,
+		"stock": 50,
+		"category": "Categoría J",
+		"thumbnails": [
+			"file_6892_041120.jpg"
+		]
 	}
 ]
