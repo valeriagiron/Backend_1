@@ -9,51 +9,85 @@ export default class CartManager {
 
     constructor() {
         this.#jsonFilename = "carts.json";
+        this.#carts = [];
     }
 
     async #findCartById(id) {
-        this.#carts = await this.getAll();
-        const cartFound = this.#carts.find((cart) => cart.id === Number(id));
+        try {
+            await this.#loadCarts();
+            const cartFound = this.#carts.find((cart) => cart.id === Number(id));
 
-        if (!cartFound) {
-            throw new ErrorManager("Carrito no encontrado", 404);
+            if (!cartFound) {
+                throw new ErrorManager("Carrito no encontrado", 404);
+            }
+
+            return cartFound;
+        } catch (error) {
+            throw new ErrorManager(`Error al buscar carrito con ID ${id}: ${error.message}`, error.code || 500);
         }
+    }
 
-        return cartFound;
+    async #loadCarts() {
+        try {
+            this.#carts = await readJsonFile(paths.files, this.#jsonFilename) || [];
+        } catch (error) {
+            this.#carts = [];
+        }
     }
 
     async getAll() {
-        return await readJsonFile(paths.files, this.#jsonFilename);
+        try {
+            await this.#loadCarts();
+            return this.#carts;
+        } catch (error) {
+            throw new ErrorManager(`Error al obtener todos los carritos: ${error.message}`, error.code || 500);
+        }
     }
 
     async getOneById(id) {
-        return await this.#findCartById(id);
+        try {
+            return await this.#findCartById(id);
+        } catch (error) {
+            throw new ErrorManager(`Error al obtener carrito por ID: ${error.message}`, error.code || 500);
+        }
     }
 
     async createCart() {
-        const newCart = {
-            id: generateId(await this.getAll()),
-            products: []
-        };
+        try {
+            await this.#loadCarts();
+            const newCart = {
+                id: generateId(this.#carts),
+                products: []
+            };
 
-        this.#carts.push(newCart);
-        await writeJsonFile(paths.files, this.#jsonFilename, this.#carts);
+            this.#carts.push(newCart);
+            await writeJsonFile(paths.files, this.#jsonFilename, this.#carts);
 
-        return newCart;
+            return newCart;
+        } catch (error) {
+            throw new ErrorManager(`Error al crear un nuevo carrito: ${error.message}`, error.code || 500);
+        }
     }
 
     async addProductToCart(cartId, productId) {
-        const cart = await this.#findCartById(cartId);
+        try {
+            const cart = await this.#findCartById(cartId);
 
-        const productInCart = cart.products.find((p) => p.product === productId);
-        if (productInCart) {
-            productInCart.quantity += 1;
-        } else {
-            cart.products.push({ product: productId, quantity: 1 });
+            const productInCart = cart.products.find((p) => p.product === Number(productId));
+            if (productInCart) {
+                productInCart.quantity += 1;
+            } else {
+                cart.products.push({ product: Number(productId), quantity: 1 });
+            }
+
+            await writeJsonFile(paths.files, this.#jsonFilename, this.#carts);
+
+            return cart;
+        } catch (error) {
+            throw new ErrorManager(
+                `Error al agregar producto con ID ${productId} al carrito ${cartId}: ${error.message}`,
+                error.code || 500
+            );
         }
-
-        await writeJsonFile(paths.files, this.#jsonFilename, this.#carts);
-
-        return cart;
     }
 }
