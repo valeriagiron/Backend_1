@@ -128,5 +128,12 @@
 		"thumbnails": [
 			"file_6892_041120.jpg"
 		]
+	},
+	{
+		"id": 11,
+		"title": "22",
+		"status": false,
+		"stock": 10,
+		"thumbnail": null
 	}
 ]
