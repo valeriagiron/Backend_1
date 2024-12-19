@@ -5,31 +5,62 @@
 <main>
     <section>
         <h3>Productos</h3>
-        {{!-- Uso de nomenclatura BEM (B de bloque, E de elemento y M de modificador)--}}
-        <div class="products">
-            <div class="products__list">
-                <ul class="products__list__item" id="products-list"></ul>
+        <div>
+            <div>
+                <h5>Ordenar por</h5>
+                <button id="tilte-asc">Nombre Ascendente</button>
+                <button id="tilte-desc">Nombre Descendente</button>
             </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Controles</th>
+                    </tr>
+                </thead>
+                <tbody id="products-list"></tbody>
+            </table>
+        </div>
+        <div>
+            <button id="prev-page">Anterior</button>
+            <span id="pagination-info"></span>
+            <button id="next-page">Siguiente</button>
         </div>
     </section>
 
     <section>
-        <h3>Formulario de Productos</h3>
-        <form class="products__form" id="products-form">
-            <input type="text" name="title" placeholder="Nombre del producto">
-            <div>¿Está activo?<input type="checkbox" name="status"></div>
-            <input type="number" name="stock" placeholder="Stock del producto">
+        <h2>Carrito</h2>
+        <div id="cart-details">El carrito está vacío.</div>
+        <button onclick="window.location.href='/cart/6763074e2797b2827b49548a'">Ir al carrito</button>
+    </section>
 
-            <input type="submit" value="Guardar" style="width: 100%">
+    <section>
+        <h3>Agregar Productos</h3>
+        <form class="form" id="products-form" enctype="multipart/form-data" method="POST" action="/api/products">
+            <div>
+                <input type="text" name="title" placeholder="Nombre">
+                <input type="text" name="category" placeholder="Categoría">
+                <input type="text" name="description" placeholder="Descripción">
+            </div>
+            <div>
+                <input type="text" name="code" placeholder="Código">
+                <input type="number" name="price" placeholder="Precio">
+                <input type="number" name="stock" placeholder="Stock">
+            </div>
+            <div>Activo <input type="checkbox" name="status"></div>
+            <input type="file" name="thumbnail" placeholder="Imagen">
+
+            <input type="submit" value="Guardar">
         </form>
     </section>
 
     <section>
-        <h3>Eliminación de Productos</h3>
+        <h3>Eliminar de Productos</h3>
         <div class="products__delete">
-            <input type="number" class="products__delete__input" id="input-product-id"
-                placeholder="ID del Producto">
-            <button id="btn-delete-products">Eliminar</button>
+            <input type="text" class="products__delete__input" id="input-product-id" placeholder="ID del Producte">
+            <button id="btn-delete-product">Eliminar</button>
         </div>
     </section>
 
@@ -38,4 +69,4 @@
 
 {{!-- El script de socket.io debe estar antes que home.js --}}
 <script src="/socket.io/socket.io.js"></script>
-<script src="/api/public/js/products.socket.js"></script>
+<script src="/public/js/products.socket.js"></script>
